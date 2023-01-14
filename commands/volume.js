@@ -1,8 +1,16 @@
-const {GuildMember} = require('discord.js');
+const {GuildMember, ApplicationCommandOptionType } = require('discord.js');
 
 module.exports = {
-  name: 'skip',
-  description: 'Skip a song!',
+  name: 'volume',
+  description: 'Change the volume!',
+  options: [
+    {
+      name: 'volume',
+      type: ApplicationCommandOptionType.Integer,
+      description: 'Number between 0-200',
+      required: true,
+    },
+  ],
   async execute(interaction, player) {
     if (!(interaction.member instanceof GuildMember) || !interaction.member.voice.channel) {
       return void interaction.reply({
@@ -23,11 +31,18 @@ module.exports = {
 
     await interaction.deferReply();
     const queue = player.getQueue(interaction.guildId);
-    if (!queue || !queue.playing) return void interaction.followUp({content: '❌ | No music is being played!'});
-    const currentTrack = queue.current;
-    const success = queue.skip();
+    if (!queue || !queue.playing)
+      return void interaction.followUp({
+        content: '❌ | No music is being played!',
+      });
+
+    var volume = interaction.options.getInteger('volume');
+    volume = Math.max(0, volume);
+    volume = Math.min(200, volume);
+    const success = queue.setVolume(volume);
+
     return void interaction.followUp({
-      content: success ? `✅ | Skipped **${currentTrack}**!` : '❌ | Something went wrong!',
+      content: success ? `🔊 | Volume set to ${volume}!` : '❌ | Something went wrong!',
     });
   },
 };

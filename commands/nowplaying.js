@@ -1,8 +1,8 @@
 const {GuildMember} = require('discord.js');
 
 module.exports = {
-  name: 'skip',
-  description: 'Skip a song!',
+  name: 'nowplaying',
+  description: 'Get the song that is currently playing.',
   async execute(interaction, player) {
     if (!(interaction.member instanceof GuildMember) || !interaction.member.voice.channel) {
       return void interaction.reply({
@@ -23,11 +23,27 @@ module.exports = {
 
     await interaction.deferReply();
     const queue = player.getQueue(interaction.guildId);
-    if (!queue || !queue.playing) return void interaction.followUp({content: '❌ | No music is being played!'});
-    const currentTrack = queue.current;
-    const success = queue.skip();
+    if (!queue || !queue.playing)
+      return void interaction.followUp({
+        content: '❌ | No music is being played!',
+      });
+    const progress = queue.createProgressBar();
+    const perc = queue.getPlayerTimestamp();
+
     return void interaction.followUp({
-      content: success ? `✅ | Skipped **${currentTrack}**!` : '❌ | Something went wrong!',
+      embeds: [
+        {
+          title: 'Now Playing',
+          description: `🎶 | **${queue.current.title}**! (\`${perc.progress}%\`)`,
+          fields: [
+            {
+              name: '\u200b',
+              value: progress,
+            },
+          ],
+          color: 0xffffff,
+        },
+      ],
     });
   },
 };

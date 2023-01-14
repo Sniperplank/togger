@@ -1,8 +1,8 @@
 const {GuildMember} = require('discord.js');
 
 module.exports = {
-  name: 'skip',
-  description: 'Skip a song!',
+  name: 'pause',
+  description: 'Pause current song!',
   async execute(interaction, player) {
     if (!(interaction.member instanceof GuildMember) || !interaction.member.voice.channel) {
       return void interaction.reply({
@@ -23,11 +23,13 @@ module.exports = {
 
     await interaction.deferReply();
     const queue = player.getQueue(interaction.guildId);
-    if (!queue || !queue.playing) return void interaction.followUp({content: '❌ | No music is being played!'});
-    const currentTrack = queue.current;
-    const success = queue.skip();
+    if (!queue || !queue.playing)
+      return void interaction.followUp({
+        content: '❌ | No music is being played!',
+      });
+    const success = queue.setPaused(true);
     return void interaction.followUp({
-      content: success ? `✅ | Skipped **${currentTrack}**!` : '❌ | Something went wrong!',
+      content: success ? '⏸ | Paused!' : '❌ | Something went wrong!',
     });
   },
 };

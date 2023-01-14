@@ -1,24 +1,33 @@
 {
   "name": "togger",
   "version": "1.0.0",
-  "description": "A bot for tog",
-  "main": "main.js",
+  "repository": "https://github.com/Sniperplank/togger.git",
+  "description": "A discord bot for me and my friends",
+  "main": "index.js",
   "scripts": {
-    "start": "nodemon main.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "prettier --write \"**/*.js\""
   },
-  "author": "Sniperplank",
-  "license": "ISC",
+  "keywords": [
+    "discord",
+    "music",
+    "bot"
+  ],
+  "author": "Gabriel Tanner",
+  "license": "MIT",
   "dependencies": {
     "@discordjs/opus": "^0.8.0",
     "discord-player": "^5.3.2",
-    "discord.js": "^14.7.1",
+    "discord.js": "^14.7.0",
     "dotenv": "^16.0.3",
     "ffmpeg": "0.0.4",
     "ffmpeg-static": "^5.1.0",
     "fluent-ffmpeg": "^2.1.2",
-    "nodemon": "^2.0.20",
     "prism-media": "^1.3.4",
     "ytdl-core": "^4.11.2"
+  },
+  "devDependencies": {
+    "prettier": "2.8.0"
   }
 }
