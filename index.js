@@ -1,12 +1,11 @@
 require('dotenv').config()
-
+const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
 const fs = require('fs');
 const Discord = require('discord.js');
 const Client = require('./client/Client');
 const config = require('./config.json');
-const {Player} = require('discord-player');
-
-const { ActivityType } = require('discord.js');
+const { Player } = require('discord-player');
+const { ActivityType, EmbedBuilder } = require('discord.js');
 
 const client = new Client();
 client.commands = new Discord.Collection();
@@ -54,11 +53,41 @@ client.once('ready', async () => {
   console.log('Ready!');
 });
 
-client.on('ready', function() {
+function dailyQuote() {
+  const channel = client.channels.cache.get('1063408083298168852')
+  let now = new Date();
+  let sixPM = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 18, 0, 0);
+  let timeUntil6PM = sixPM.getTime() - now.getTime();
+  if (timeUntil6PM < 0) {
+    timeUntil6PM += 86400000; // 86400000 is the number of milliseconds in a day
+  }
+  setTimeout(async () => {
+    let response = await fetch('https://self-boost-quotes-api.vercel.app/')
+    let data = await response.json()
+    const quoteEmbed = new EmbedBuilder()
+      .setColor(0x0099FF)
+      .setTitle('Daily Quote')
+      .setDescription(data.message)
+
+    channel.send({ embeds: [quoteEmbed] })
+    setInterval(async () => {
+      let response = await fetch('https://self-boost-quotes-api.vercel.app/')
+      let data = await response.json()
+      const quoteEmbed = new EmbedBuilder()
+        .setColor(0x0099FF)
+        .setTitle('Daily Quote')
+        .setDescription(data.message)
+      channel.send({ embeds: [quoteEmbed] })
+    }, 86400000)
+  }, timeUntil6PM)
+}
+
+client.on('ready', function () {
   client.user.setPresence({
     activities: [{ name: config.activity, type: Number(config.activityType) }],
     status: Discord.PresenceUpdateStatus.Online,
   });
+  dailyQuote()
 });
 
 client.once('reconnecting', () => {
