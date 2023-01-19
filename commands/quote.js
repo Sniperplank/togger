@@ -1,4 +1,4 @@
-const {GuildMember} = require('discord.js');
+const {GuildMember, EmbedBuilder} = require('discord.js');
 const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
 
 module.exports = {
@@ -7,6 +7,11 @@ module.exports = {
   async execute(interaction, player) {
     let response = await fetch('https://self-boost-quotes-api.vercel.app/')
     let data = await response.json()
-    await interaction.channel.send(data.message)
+    const quoteEmbed = new EmbedBuilder()
+      .setColor(0x0099FF)
+      .setTitle('Quote')
+      .setDescription(data.message)
+
+    await interaction.channel.send({ embeds: [quoteEmbed] })
   },
 };

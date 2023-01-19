@@ -54,7 +54,7 @@ client.once('ready', async () => {
 });
 
 function dailyQuote() {
-  const channel = client.channels.cache.get('1063408083298168852')
+  const channel = client.channels.cache.get('863636389730844683')
   let now = new Date();
   let sixPM = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 18, 0, 0);
   let timeUntil6PM = sixPM.getTime() - now.getTime();
