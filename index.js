@@ -53,33 +53,29 @@ client.once('ready', async () => {
   console.log('Ready!');
 });
 
-function dailyQuote() {
-  const channel = client.channels.cache.get('863636389730844683')
-  let now = new Date();
-  let sixPM = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 18, 0, 0);
-  let timeUntil6PM = sixPM.getTime() - now.getTime();
-  if (timeUntil6PM < 0) {
-    timeUntil6PM += 86400000; // 86400000 is the number of milliseconds in a day
-  }
-  setTimeout(async () => {
-    let response = await fetch('https://self-boost-quotes-api.vercel.app/')
-    let data = await response.json()
-    const quoteEmbed = new EmbedBuilder()
-      .setColor(0x0099FF)
-      .setTitle('Daily Quote')
-      .setDescription(data.message)
+const sendQuote = async () => {
+  const channel = client.channels.cache.get('1063408083298168852') // tog general: 863636389730844683
+  let response = await fetch('https://self-boost-quotes-api.vercel.app/')
+  let data = await response.json()
+  const quoteEmbed = new EmbedBuilder()
+    .setColor(0x0099FF)
+    .setTitle('Daily Quote')
+    .setDescription(data.message)
+  channel.send({ embeds: [quoteEmbed] });
+  scheduleNextQuote();
+}
 
-    channel.send({ embeds: [quoteEmbed] })
-    setInterval(async () => {
-      let response = await fetch('https://self-boost-quotes-api.vercel.app/')
-      let data = await response.json()
-      const quoteEmbed = new EmbedBuilder()
-        .setColor(0x0099FF)
-        .setTitle('Daily Quote')
-        .setDescription(data.message)
-      channel.send({ embeds: [quoteEmbed] })
-    }, 86400000)
-  }, timeUntil6PM)
+const scheduleNextQuote = () => {
+  let today = new Date();
+  let tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  tomorrow.setHours(21);
+  tomorrow.setMinutes(45);
+  tomorrow.setSeconds(0);
+
+  let timeUntilNextQuote = tomorrow - today;
+  console.log("Time until next quote " + timeUntilNextQuote)
+  setTimeout(sendQuote, timeUntilNextQuote);
 }
 
 client.on('ready', function () {
@@ -87,7 +83,7 @@ client.on('ready', function () {
     activities: [{ name: config.activity, type: Number(config.activityType) }],
     status: Discord.PresenceUpdateStatus.Online,
   });
-  dailyQuote()
+  scheduleNextQuote()
 });
 
 client.once('reconnecting', () => {
