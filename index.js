@@ -58,7 +58,7 @@ const sendQuote = async () => {
   let response = await fetch('https://self-boost-quotes-api.vercel.app/')
   let data = await response.json()
   const quoteEmbed = new EmbedBuilder()
-    .setColor(0x0099FF)
+    .setColor(0xfff200)
     .setTitle('Daily Quote')
     .setDescription(data.message)
   channel.send({ embeds: [quoteEmbed] });
