@@ -37,6 +37,10 @@ player.on('trackAdd', (queue, track) => {
   queue.metadata.send(`🎶 | Track **${track.title}** queued!`);
 });
 
+player.on('tracksAdd', (queue, tracks) => {
+  queue.metadata.send(`🎶 | **${tracks.length}** tracks queued!`);
+});
+
 player.on('botDisconnect', queue => {
   queue.metadata.send('❌ | I was manually disconnected from the voice channel, clearing queue!');
 });
