@@ -5,7 +5,7 @@ const Discord = require('discord.js');
 const Client = require('./client/Client');
 const config = require('./config.json');
 const { Player } = require('discord-player');
-const { ActivityType, EmbedBuilder } = require('discord.js');
+const { ActivityType, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 
 const client = new Client();
 client.commands = new Discord.Collection();
@@ -30,7 +30,24 @@ player.on('connectionError', (queue, error) => {
 });
 
 player.on('trackStart', (queue, track) => {
-  queue.metadata.send(`▶ | Started playing: **${track.title}** in **${queue.connection.channel.name}**!`);
+  const row = new ActionRowBuilder()
+    .addComponents(
+      new ButtonBuilder()
+        .setCustomId('skipButton')
+        .setLabel('Skip')
+        .setStyle(ButtonStyle.Primary),
+      new ButtonBuilder()
+        .setCustomId('stopButton')
+        .setLabel('Stop')
+        .setStyle(ButtonStyle.Danger),
+    );
+  const embed = new EmbedBuilder()
+    .setColor(0xfff200)
+    .setTitle(`Playing: ${track.title}`)
+    .setURL(track.url)
+    .setDescription(`[0:00 / ${track.duration}]`);
+
+  queue.metadata.send({ embeds: [embed], components: [row] });
 });
 
 player.on('trackAdd', (queue, track) => {
@@ -116,19 +133,38 @@ client.on('messageCreate', async message => {
 });
 
 client.on('interactionCreate', async interaction => {
-  const command = client.commands.get(interaction.commandName.toLowerCase());
-
-  try {
-    if (interaction.commandName == 'ban' || interaction.commandName == 'userinfo') {
-      command.execute(interaction, client);
-    } else {
-      command.execute(interaction, player);
+  if (interaction.isButton()) {
+    const skipCommand = client.commands.get('skip');
+    const stopCommand = client.commands.get('stop');
+    try {
+      if (interaction.customId == 'skipButton') {
+        skipCommand.execute(interaction, player);
+      }
+      if (interaction.customId == 'stopButton') {
+        stopCommand.execute(interaction, player);
+      }
+    } catch (error) {
+      console.error(error);
+      interaction.followUp({
+        content: 'Button did not respond!',
+      });
     }
-  } catch (error) {
-    console.error(error);
-    interaction.followUp({
-      content: 'There was an error trying to execute that command!',
-    });
+
+  } else {
+    const command = client.commands.get(interaction.commandName.toLowerCase());
+
+    try {
+      if (interaction.commandName == 'ban' || interaction.commandName == 'userinfo') {
+        command.execute(interaction, client);
+      } else {
+        command.execute(interaction, player);
+      }
+    } catch (error) {
+      console.error(error);
+      interaction.followUp({
+        content: 'There was an error trying to execute that command!',
+      });
+    }
   }
 });
 
