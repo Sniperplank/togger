@@ -6,7 +6,7 @@ module.exports = {
   async execute(interaction, player) {
     if (!interaction.member.roles.cache.has('877711181740138538')) {
       return void interaction.reply({
-        content: 'You do not have permission to skip!',
+        content: 'You do not have permission to skip! Ask zero or sniper, pleb',
         ephemeral: true,
       });
     }
@@ -33,7 +33,7 @@ module.exports = {
     const currentTrack = queue.current;
     const success = queue.skip();
     return void interaction.followUp({
-      content: success ? `✅ | Skipped **${currentTrack}**!` : '❌ | Something went wrong!',
+      content: success ? `✅ | **${interaction.user.username}** skipped **${currentTrack}**!` : '❌ | Something went wrong!',
     });
   },
 };
