@@ -1,9 +1,15 @@
-const {GuildMember} = require('discord.js');
+const { GuildMember } = require('discord.js');
 
 module.exports = {
   name: 'skip',
   description: 'Skip a song!',
   async execute(interaction, player) {
+    if (!interaction.member.roles.cache.has('877711181740138538')) {
+      return void interaction.reply({
+        content: 'You do not have permission to skip!',
+        ephemeral: true,
+      });
+    }
     if (!(interaction.member instanceof GuildMember) || !interaction.member.voice.channel) {
       return void interaction.reply({
         content: 'You are not in a voice channel!',
@@ -23,7 +29,7 @@ module.exports = {
 
     await interaction.deferReply();
     const queue = player.getQueue(interaction.guildId);
-    if (!queue || !queue.playing) return void interaction.followUp({content: '❌ | No music is being played!'});
+    if (!queue || !queue.playing) return void interaction.followUp({ content: '❌ | No music is being played!' });
     const currentTrack = queue.current;
     const success = queue.skip();
     return void interaction.followUp({
