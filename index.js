@@ -6,9 +6,15 @@ const Client = require('./client/Client');
 const config = require('./config.json');
 const { Player } = require('discord-player');
 const { ActivityType, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { Configuration, OpenAIApi } = require('openai');
+
+const configuration = new Configuration({
+  apiKey: process.env.OPENAI_API_KEY
+});
 
 const client = new Client();
 client.commands = new Discord.Collection();
+client.openai = new OpenAIApi(configuration);
 
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 
@@ -154,7 +160,7 @@ client.on('interactionCreate', async interaction => {
     const command = client.commands.get(interaction.commandName.toLowerCase());
 
     try {
-      if (interaction.commandName == 'ban' || interaction.commandName == 'userinfo') {
+      if (interaction.commandName == 'ban' || interaction.commandName == 'userinfo' || interaction.commandName == 'gpt') {
         command.execute(interaction, client);
       } else {
         command.execute(interaction, player);
