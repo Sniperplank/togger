@@ -105,12 +105,38 @@ const scheduleNextQuote = () => {
   setTimeout(sendQuote, timeUntilNextQuote);
 }
 
+const sendJoke = async () => {
+  const channel = client.channels.cache.get('863640879667347456')
+  let response = await fetch('https://v2.jokeapi.dev/joke/Miscellaneous,Dark,Pun?type=single')
+  let data = await response.json()
+  const jokeEmbed = new EmbedBuilder()
+    .setColor(0xfff200)
+    .setTitle('Daily Joke')
+    .setDescription(data.joke)
+  channel.send({ embeds: [jokeEmbed] });
+  scheduleNextJoke();
+}
+
+const scheduleNextJoke = () => {
+  let today = new Date();
+  let tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  tomorrow.setHours(20);
+  tomorrow.setMinutes(45);
+  tomorrow.setSeconds(0);
+
+  let timeUntilNextJoke = tomorrow - today;
+  console.log("Time until next joke " + timeUntilNextJoke)
+  setTimeout(sendJoke, timeUntilNextJoke);
+}
+
 client.on('ready', function () {
   client.user.setPresence({
     activities: [{ name: config.activity, type: Number(config.activityType) }],
     status: Discord.PresenceUpdateStatus.Online,
   });
   scheduleNextQuote()
+  scheduleNextJoke()
 });
 
 client.once('reconnecting', () => {
