@@ -17,14 +17,15 @@ module.exports = {
 
         try {
             // Generate a response using the GPT-3 API
-            const completions = await client.openai.createCompletion({
-                model: 'text-davinci-003',
-                prompt: prompt,
-                max_tokens: 1024,
-                temperature: 0.7,
+            const completions = await client.openai.createChatCompletion({
+                model: 'gpt-3.5-turbo',
+                messages: [
+                    { "role": "system", "content": "You are a discord bot that helps the server members with their inquiries" },
+                    { "role": "user", "content": prompt }
+                ],
             });
 
-            const message = completions.data.choices[0].text.trim();
+            const message = completions.data.choices[0].message.content
 
             const embed = new EmbedBuilder()
                 .setColor(0xfff200)
