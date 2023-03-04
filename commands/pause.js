@@ -1,4 +1,4 @@
-const {GuildMember} = require('discord.js');
+const { GuildMember } = require('discord.js');
 
 module.exports = {
   name: 'pause',
@@ -22,12 +22,12 @@ module.exports = {
     }
 
     await interaction.deferReply();
-    const queue = player.getQueue(interaction.guildId);
-    if (!queue || !queue.playing)
+    const queue = player.nodes.get(interaction.guildId);
+    if (!queue || !queue.node.isPlaying())
       return void interaction.followUp({
         content: '❌ | No music is being played!',
       });
-    const success = queue.setPaused(true);
+    const success = queue.node.pause();
     return void interaction.followUp({
       content: success ? '⏸ | Paused!' : '❌ | Something went wrong!',
     });

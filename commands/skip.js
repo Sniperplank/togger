@@ -28,10 +28,10 @@ module.exports = {
     }
 
     await interaction.deferReply();
-    const queue = player.getQueue(interaction.guildId);
-    if (!queue || !queue.playing) return void interaction.followUp({ content: '❌ | No music is being played!' });
-    const currentTrack = queue.current;
-    const success = queue.skip();
+    const queue = player.nodes.get(interaction.guildId);
+    if (!queue || !queue.node.isPlaying()) return void interaction.followUp({ content: '❌ | No music is being played!' });
+    const currentTrack = queue.currentTrack;
+    const success = queue.node.skip();
     return void interaction.followUp({
       content: success ? `✅ | **${interaction.user.username}** skipped **${currentTrack}**!` : '❌ | Something went wrong!',
     });

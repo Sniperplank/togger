@@ -27,15 +27,15 @@ for (const file of commandFiles) {
 
 const player = new Player(client);
 
-player.on('error', (queue, error) => {
+player.events.on('error', (queue, error) => {
   console.log(`[${queue.guild.name}] Error emitted from the queue: ${error.message}`);
 });
 
-player.on('connectionError', (queue, error) => {
+player.events.on('playerError', (queue, error) => {
   console.log(`[${queue.guild.name}] Error emitted from the connection: ${error.message}`);
 });
 
-player.on('trackStart', (queue, track) => {
+player.events.on('playerStart', (queue, track) => {
   const row = new ActionRowBuilder()
     .addComponents(
       new ButtonBuilder()
@@ -56,23 +56,23 @@ player.on('trackStart', (queue, track) => {
   queue.metadata.send({ embeds: [embed], components: [row] });
 });
 
-player.on('trackAdd', (queue, track) => {
+player.events.on('audioTrackAdd', (queue, track) => {
   queue.metadata.send(`🎶 | Track **${track.title}** queued!`);
 });
 
-player.on('tracksAdd', (queue, tracks) => {
+player.events.on('audioTracksAdd', (queue, tracks) => {
   queue.metadata.send(`🎶 | **${tracks.length}** tracks queued!`);
 });
 
-player.on('botDisconnect', queue => {
+player.events.on('disconnect', queue => {
   queue.metadata.send('❌ | I was manually disconnected from the voice channel, clearing queue!');
 });
 
-player.on('channelEmpty', queue => {
+player.events.on('emptyChannel', queue => {
   queue.metadata.send('❌ | Nobody is in the voice channel, leaving...');
 });
 
-player.on('queueEnd', queue => {
+player.events.on('emptyQueue', queue => {
   queue.metadata.send('✅ | Queue finished!');
 });
 
@@ -81,7 +81,7 @@ client.once('ready', async () => {
 });
 
 const sendQuote = async () => {
-  const channel = client.channels.cache.get('1063408083298168852') // tog general: 863636389730844683
+  const channel = client.channels.cache.get('1063408083298168852') // tog general: 863636389730844683 
   let response = await fetch('https://self-boost-quotes-api.vercel.app/')
   let data = await response.json()
   const quoteEmbed = new EmbedBuilder()

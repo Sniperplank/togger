@@ -1,4 +1,4 @@
-const {GuildMember, ApplicationCommandOptionType } = require('discord.js');
+const { GuildMember, ApplicationCommandOptionType } = require('discord.js');
 
 module.exports = {
   name: 'remove',
@@ -30,12 +30,12 @@ module.exports = {
     }
 
     await interaction.deferReply();
-    const queue = player.getQueue(interaction.guildId);
-    if (!queue || !queue.playing) return void interaction.followUp({content: '❌ | No music is being played!'});
+    const queue = player.nodes.get(interaction.guildId);
+    if (!queue || !queue.node.isPlaying()) return void interaction.followUp({ content: '❌ | No music is being played!' });
     const number = interaction.options.getInteger('number') - 1;
-    if (number > queue.tracks.length)
-      return void interaction.followUp({content: '❌ | Track number greater than queue depth!'});
-    const removedTrack = queue.remove(number);
+    if (number > queue.tracks.size)
+      return void interaction.followUp({ content: '❌ | Track number greater than queue depth!' });
+    const removedTrack = queue.node.remove(number);
     return void interaction.followUp({
       content: removedTrack ? `✅ | Removed **${removedTrack}**!` : '❌ | Something went wrong!',
     });

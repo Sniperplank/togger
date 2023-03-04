@@ -1,4 +1,4 @@
-const {GuildMember, ApplicationCommandOptionType } = require('discord.js');
+const { GuildMember, ApplicationCommandOptionType } = require('discord.js');
 
 module.exports = {
   name: 'swap',
@@ -36,21 +36,21 @@ module.exports = {
     }
 
     await interaction.deferReply();
-    const queue = player.getQueue(interaction.guildId);
-    if (!queue || !queue.playing) return void interaction.followUp({content: '❌ | No music is being played!'});
+    const queue = player.nodes.get(interaction.guildId);
+    if (!queue || !queue.node.isPlaying()) return void interaction.followUp({ content: '❌ | No music is being played!' });
     const queueNumbers = [interaction.options.getInteger('track1') - 1, interaction.options.getInteger('track2') - 1];
     // Sort so the lowest number is first for swap logic to work
     queueNumbers.sort(function (a, b) {
       return a - b;
     });
-    if (queueNumbers[1] > queue.tracks.length)
-      return void interaction.followUp({content: '❌ | Track number greater than queue depth!'});
+    if (queueNumbers[1] > queue.tracks.size)
+      return void interaction.followUp({ content: '❌ | Track number greater than queue depth!' });
 
     try {
-      const track2 = queue.remove(queueNumbers[1]); // Remove higher track first to avoid list order issues
-      const track1 = queue.remove(queueNumbers[0]);
-      queue.insert(track2, queueNumbers[0]); // Add track in lowest position first to avoid list order issues
-      queue.insert(track1, queueNumbers[1]);
+      const track2 = queue.node.remove(queueNumbers[1]); // Remove higher track first to avoid list order issues
+      const track1 = queue.node.remove(queueNumbers[0]);
+      queue.insertTrack(track2, queueNumbers[0]); // Add track in lowest position first to avoid list order issues
+      queue.insertTrack(track1, queueNumbers[1]);
       return void interaction.followUp({
         content: `✅ | Swapped **${track1}** & **${track2}**!`,
       });

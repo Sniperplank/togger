@@ -1,5 +1,5 @@
-const {GuildMember, ApplicationCommandOptionType} = require('discord.js');
-const {QueryType} = require('discord-player');
+const { GuildMember, ApplicationCommandOptionType } = require('discord.js');
+const { QueryType } = require('discord-player');
 
 module.exports = {
   name: 'playtop',
@@ -39,18 +39,21 @@ module.exports = {
           requestedBy: interaction.user,
           searchEngine: QueryType.AUTO,
         })
-        .catch(() => {});
+        .catch(() => { });
       if (!searchResult || !searchResult.tracks.length)
-        return void interaction.followUp({content: 'No results were found!'});
+        return void interaction.followUp({ content: 'No results were found!' });
 
-      const queue = await player.createQueue(interaction.guild, {
+      const queue = await player.nodes.create(interaction.guild, {
         ytdlOptions: {
-        quality: "highest",
-        filter: "audioonly",
-        highWaterMark: 1 << 25,
-        dlChunkSize: 0,
-      },
+          quality: "highest",
+          filter: "audioonly",
+          highWaterMark: 1 << 25,
+          dlChunkSize: 0,
+        },
         metadata: interaction.channel,
+        selfDeaf: false,
+        leaveOnEmpty: false,
+        leaveOnEnd: false,
       });
 
       try {
@@ -65,8 +68,8 @@ module.exports = {
       await interaction.followUp({
         content: `⏱ | Loading your ${searchResult.playlist ? 'playlist' : 'track'}...`,
       });
-      searchResult.playlist ? queue.insert(searchResult.tracks, 0) : queue.insert(searchResult.tracks[0], 0);
-      if (!queue.playing) await queue.play();
+      searchResult.playlist ? queue.insertTrack(searchResult.tracks, 0) : queue.insertTrack(searchResult.tracks[0], 0);
+      if (!queue.node.isPlaying()) await queue.node.play();
     } catch (error) {
       console.log(error);
       interaction.followUp({
